@@ -10,7 +10,7 @@ Otaflow is an update server for Expo apps (the Expo Updates protocol) with a das
 
 Read as needed:
 - `references/setup.md`: project and build setup (`app.json`, channels, runtime versions, environment values). **Most "update does not arrive" problems are here.**
-- `references/commands.md`: every command and flag (the CLI's own `--help` does not list the flags of nested commands such as `keys init`, so rely on this file).
+- `references/commands.md`: every command and flag (`otaflow <command> --help` shows the same flags for your installed version).
 - `references/concepts.md`: how it works, roles, rollbacks, safety properties.
 - `references/ci.md`: CI keys and a GitHub Actions example.
 - `references/troubleshooting.md`: error messages and fixes, and why a device did not update.

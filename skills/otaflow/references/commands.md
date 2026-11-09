@@ -1,6 +1,6 @@
 # otaflow commands
 
-Every command takes `--json` (machine-readable output) and `--api-url <url>` (or `OTAFLOW_API_URL`; default `https://api.otaflow.com`). Flags are listed below because `otaflow <group> <command> --help` (for example `keys init`, `apps create`, `apikey create`, `promotions approve`) does not print the command's own flags in this version; `otaflow rollback --help`, `publish --help`, `promote --help`, `list --help` and `pause --help` do.
+Every command takes `--json` (machine-readable output) and `--api-url <url>` (or `OTAFLOW_API_URL`; default `https://api.otaflow.com`). `otaflow <command> --help` (for example `otaflow keys init --help`) prints a command's flags for the installed version; they are listed here too.
 
 ## Account and apps
 

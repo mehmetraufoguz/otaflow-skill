@@ -73,15 +73,16 @@ A promotion moves the **same signed update** from `preview` to `production`; it 
 npx expo-updates runtimeversion:resolve --platform ios
 ```
 
-The values must match between preview and production builds (and must not change from one build number to the next). Known causes of a split, measured with `@expo/fingerprint` 0.20.x (verify on your version):
+The values must match between preview and production builds (and must not change from one build number to the next). What was measured with `@expo/fingerprint` 0.21.x (Expo SDK 58); verify on your version, because the defaults move between releases:
 
-- `version` and the iOS `buildNumber` are hashed, so an auto-incremented build number makes every build its own runtime.
-- `package.json` scripts are hashed: adding an npm script changes the runtime.
-- `eas.json` and `.gitignore` are hashed.
 - **`updates.requestHeaders` is hashed**, and it differs between preview and production builds, so the two never match.
-- The code-signing certificate is **not** hashed: a rotated key under the same path keeps the same runtime, though old binaries cannot verify the new key.
+- `package.json` scripts are hashed: adding an npm script changes the runtime.
+- `.gitignore` is hashed.
+- `version` and the iOS `buildNumber` were **not** hashed in that version, but older versions did; the config below skips them anyway, so an auto-incremented build number can never split your builds.
+- `eas.json` was not hashed (ignoring it is harmless).
+- The code-signing certificate file is **not** hashed by default: a rotated key under the same path keeps the same runtime, though old binaries cannot verify the new key.
 
-A `fingerprint.config.js` next to `app.json` fixes these:
+A `fingerprint.config.js` next to `app.json` fixes these (with it in place, the channel header, a version bump and a new npm script left the runtime unchanged, and a different certificate moved it):
 
 ```js
 /** @type {import("expo/fingerprint").Config} */
