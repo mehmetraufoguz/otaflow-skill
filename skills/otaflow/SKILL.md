@@ -19,14 +19,14 @@ Read as needed:
 
 - Ships **JavaScript and assets** only. Anything native (a new native package, an Expo SDK upgrade, config plugins, icons, entitlements) needs a new binary: the update targets a runtime version, and a native change makes a new one.
 - Updates run in **release builds** of the app. Expo Go and debug / development-client builds do not apply them.
-- **iOS only** for now (`--platform ios`, the default). Android is not served yet.
+- **iOS** is the tested platform (`--platform ios`, the default). `--platform android` publishes and is served the same way, but it has not been run on an Android device yet: say so rather than promising it works.
 - Devices download an update at launch and run it on the launch **after** that. There is no instant push.
 
 ## When helping someone
 
 1. **Find out the situation first.** Run `otaflow whoami`; look for `.otaflow/project.json` (the folder is linked to an app) and `certs/certificate.pem`; check `expo-updates` is in `package.json`; check `app.json` has an `updates` block. Don't assume.
 2. **Never touch the private signing key.** Do not print it, read it into the conversation, copy it into the project, commit it, or put it in an environment file. The certificate (`certs/certificate.pem`) is public and is committed; the private key lives in the user's config folder (or `OTAFLOW_SIGNING_KEY` / `OTAFLOW_SIGNING_KEY_PATH` in CI secrets).
-3. **Ask before anything that reaches users or changes access:** promoting to production, publishing straight to `production`, any `rollback`, `pause` / `resume`, `keys revoke`, `apikey create` / `delete`. Say what it will do and to which channel. Publishing to `preview` is safe to run.
+3. **Ask before anything that reaches users or changes access:** promoting to production, publishing straight to `production`, any `rollback`, `pause` / `resume`, `keys revoke`, `apikey create` / `delete`, `storage connect` / `disconnect`, and `members role` / `access` / `remove` / `invite`. Say what it will do and to which channel. Publishing to `preview` is safe to run.
 4. **Verify with commands, don't guess.** `otaflow list` shows each channel, its head update and recent updates. Read what it prints; do not assume a publish or promotion landed.
 5. **Prefer `--json`** when you need to parse output; every command supports it.
 6. **Do not work around a refusal.** If the CLI refuses (dirty git tree, a value from `.env` in the bundle, a role that may not do something), explain why and fix the cause. Never pass `--new-runtime` just to get past an error; see `references/troubleshooting.md`.
@@ -42,6 +42,10 @@ Read as needed:
 | Undo the latest update | `otaflow rollback --channel production --previous`. |
 | Stop an update spreading right now | `otaflow pause --channel production`. |
 | Wire it into CI | `references/ci.md`. |
+| Check a project's setup | `otaflow doctor`: it checks login, key, certificate, `app.json` and runtime, and says what to fix. |
+| Keep the updates in their own bucket | `otaflow storage connect`, **before the first publish** (`references/commands.md`, "Your own bucket"). |
+| Add or manage people | `otaflow members list` / `invite` / `role` / `access` / `remove` (owner). |
+| See what happened | `otaflow log` (owner and manager). |
 | Find out why a device did not update | `references/troubleshooting.md`, section "On the device". |
 | Ship something native | Not possible over the air: a new binary is needed. |
 

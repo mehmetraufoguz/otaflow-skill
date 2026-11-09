@@ -3,7 +3,7 @@
 ## The pieces
 
 - **App**: one Expo app. Its update URL is `https://ota.otaflow.com/u/<slug>/manifest`. The slug is permanent.
-- **Account**: owns apps and has a plan that sets seats and storage.
+- **Account**: owns apps and has a plan that sets seats and storage. An app can keep its updates in the customer's own bucket instead (`otaflow storage connect`, chosen before the first publish); those bytes do not count against the plan.
 - **Channels**: `preview` and `production`. A binary asks for one channel (the `expo-channel-name` request header).
 - **Runtime version**: a hash of the native layer (`runtimeVersion: { policy: "fingerprint" }`). An update only reaches binaries with the same runtime, so a JavaScript-only change reaches installed apps and a native change needs a new binary.
 - **Code signing**: every manifest is signed with the app's private key; the binary carries the certificate and refuses anything not signed by it. Otaflow stores only the public key and checks each signature when you publish.

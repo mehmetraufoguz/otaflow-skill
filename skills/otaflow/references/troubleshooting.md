@@ -16,7 +16,8 @@ Messages are shown as the CLI prints them. Fix the cause; do not work around a r
 | `Only the account owner publishes straight to production; promote from preview.` | Publish to preview, then `otaflow promote`. |
 | `This account has no active plan: publishing is read-only.` | The account has no active plan (or it lapsed). Publishing and uploads are closed until a plan is active; devices keep getting what is already published. Ask the account owner or Otaflow. |
 | `Platform storage is full (... bytes used; this needs ... more). Free space, add a storage pack, or connect your own bucket.` | The account's storage is full. Nothing stored is lost and devices still get updates, but no new bytes are accepted. |
-| `Only ios is published for now.` | `--platform android` is not available yet. |
+| `The platform must be ios or android.` | Another value was passed to `--platform`. |
+| `This commit is already the head of <channel>: commit the change you meant to ship.` | Nothing new since the last publish of this runtime; the CLI says so before exporting. |
 | `That key id is already used on this app (revoked ids stay taken): choose another.` | A key id is used once. Pick a new `--key-id` for the new key. |
 | `The signature does not verify under key ...` | The manifest was signed with a different key than the one named. Use the matching `--key-id` and key. |
 
@@ -54,3 +55,16 @@ Work down this list when a build does not pick up an update (`references/setup.m
 7. **Is the head what you expect?** `otaflow list`; a rollback or a newer promotion may have replaced it.
 
 Devices download at launch and run an update at the **next** launch: close the app fully and open it twice. A device that refuses an update keeps what it runs: that happens for a manifest not signed by the key in its certificate, a manifest or file that was changed, or a different runtime version. A runtime version change (anything native) needs a new binary.
+
+## Your own bucket
+
+| Message | Meaning and fix |
+|---|---|
+| `The bucket refused to store an object: check the access key and its permissions.` | The key cannot write there. It needs read, write and delete on the bucket (or the `--prefix`). |
+| `The key can write but not delete: grant delete access.` | The test object could not be removed; add delete permission. |
+| `The bucket or path was not found ...` | Wrong bucket name, endpoint or region. R2 uses region `auto`; S3 refuses a wrong region. |
+| `This app already stores updates. Choose the storage before the first publish: existing assets are not moved.` | Storage is chosen before an app's first publish. Create a new app to use a bucket from the start. |
+| `This app already stores updates in that bucket, and they are not moved: it cannot go back to platform storage.` | Disconnect only works while nothing is stored. |
+| `The endpoint must use https.` / `must be a public hostname.` | Only https endpoints on public hostnames are accepted. |
+| `The storage encryption key is not configured.` | The Otaflow service itself is missing its sealing secret: a platform problem, not the customer's. |
+| A device says the update failed to download after the bucket changed | `otaflow storage check`; a revoked or rotated bucket key makes downloads fail while devices keep running what they have. |
