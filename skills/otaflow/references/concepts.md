@@ -38,4 +38,4 @@ Devices launch the newest update they hold, so serving an old manifest again wou
 - The private key never reaches Otaflow. A compromised platform cannot make a device run code you did not sign.
 - Devices verify the signature on every manifest and the hash of every asset; a tampered manifest or file is refused and the device keeps what it runs.
 - Pausing a channel stops updates within seconds (the edge caches a decision for about 10 seconds) and undoes nothing.
-- A revoked signing key cannot publish again, but updates it already signed stay live until rolled back.
+- A revoked signing key cannot publish again, and **updates it signed are no longer handed to devices**: for each channel the platform serves the newest update signed by a key that is still trusted (or none). `otaflow keys revoke` lists the heads that stopped, and `otaflow list` marks them. Devices that already run an update signed by that key keep it, and binaries that trust only that key's certificate cannot verify another key's updates: moving on takes a new binary. Revoke a key only when it must not be trusted any more, not as a way to rotate while shipped binaries still depend on it.

@@ -26,7 +26,8 @@ Messages are shown as the CLI prints them. Fix the cause; do not work around a r
 | Message | Meaning and fix |
 |---|---|
 | `You may not do that on this app.` | The role or key lacks the action (see the table in `concepts.md`). |
-| `That update is already on production.` | It was promoted (or rolled back across) already. Publish a new update to ship more. |
+| `That update is already on production.` | It is the update production runs now. Publish a new update to ship more. |
+| `That update already went to production and has been replaced or rolled back since...` | A promotion is not repeated. Commit a change and publish again. |
 | `Production already runs something newer than this update.` | Promotions only move forward. Publish again. |
 | `This request expired after 48 hours: ask again.` | Run `otaflow promote` again. |
 | `A manager can undo only the latest update: go back to the one before it, or to the embedded JavaScript.` | Managers may use `--previous` or `--embedded` only. |
@@ -68,3 +69,7 @@ Devices download at launch and run an update at the **next** launch: close the a
 | `The endpoint must use https.` / `must be a public hostname.` | Only https endpoints on public hostnames are accepted. |
 | `The storage encryption key is not configured.` | The Otaflow service itself is missing its sealing secret: a platform problem, not the customer's. |
 | A device says the update failed to download after the bucket changed | `otaflow storage check`; a revoked or rotated bucket key makes downloads fail while devices keep running what they have. |
+
+## A channel serves an older update than the head
+
+`otaflow list` shows `signed by a revoked key: not handed to devices; they get <id> instead` under a head. The key that signed it was revoked, so devices are handed the newest update signed by a trusted key (or none). Publish a new update with an active key to replace it; devices whose binary trusts only the revoked key's certificate need a new binary.

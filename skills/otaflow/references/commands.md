@@ -24,7 +24,7 @@ The private key never leaves the user's machine.
 | `otaflow keys list` | Keys registered for the app and whether each is active or revoked. |
 | `otaflow keys public [--key <private.pem>]` | Print the fingerprint of a local private key. |
 | `otaflow keys path [--key-id main]` | Where the private key is on this machine, for the backup. Prints the path, never the key. |
-| `otaflow keys revoke --key-id <id>` | Stop accepting publishes signed with the key (owner). Installed apps that trust its certificate keep running what they run. |
+| `otaflow keys revoke --key-id <id>` | Stop trusting the key (owner): publishes signed with it are refused and updates it signed are no longer handed to devices (each channel serves the newest update signed by a trusted key, or none). It prints which heads stopped. Installs that already run such an update keep it. Ask the user first: it changes what devices receive. |
 
 A key id is used once per app: a revoked id stays taken, so a new key always gets a new `--key-id` (and new builds name it in `codeSigningMetadata.keyid`). The key is found in this order: `--key <path>`, `OTAFLOW_SIGNING_KEY` (the PEM text), `OTAFLOW_SIGNING_KEY_PATH`, then the app's key folder in the user's config directory.
 

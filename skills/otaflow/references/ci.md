@@ -46,4 +46,4 @@ jobs:
 ## 3. Rotating or removing
 
 - Delete a key: `otaflow apikey delete --app my-app --id <keyId>` (find the id with `otaflow apikey list --app my-app`). Whatever uses it stops working at once.
-- Replace a signing key: `otaflow keys init --key-id v2` makes and registers a new key under a **new** id (an id is never reused). Binaries already shipped keep trusting the old certificate, so keep the old key active until they are gone, and name `v2` in `codeSigningMetadata.keyid` (and the certificate path) of new builds. Revoking the old key (`keys revoke`) stops publishes signed with it.
+- Replace a signing key: `otaflow keys init --key-id v2` makes and registers a new key under a **new** id (an id is never reused). Binaries already shipped keep trusting the old certificate, so keep the old key active until they are gone, and name `v2` in `codeSigningMetadata.keyid` (and the certificate path) of new builds. Revoking the old key (`keys revoke`) stops publishes signed with it **and stops devices being handed updates it signed**, so do it only when those binaries are gone or the key must not be trusted.
