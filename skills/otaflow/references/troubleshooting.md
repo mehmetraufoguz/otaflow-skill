@@ -14,8 +14,10 @@ Messages are shown as the CLI prints them. Fix the cause; do not work around a r
 | `Could not read the private key at ...` | The key is not where the CLI looks. Pass `--key`, or set `OTAFLOW_SIGNING_KEY` / `OTAFLOW_SIGNING_KEY_PATH`. |
 | `expo-updates` errors from `runtimeversion:resolve` | `expo-updates` is not installed in the project, or the project is not an Expo app. `npx expo install expo-updates`. |
 | `Only the account owner publishes straight to production; promote from preview.` | Publish to preview, then `otaflow promote`. |
-| The account plan refuses uploads | The account has no active plan (or it lapsed). Publishing is closed until the plan is active; devices keep working. Contact the account owner or Otaflow. |
-| A storage error (HTTP 507) | The account's platform storage is full. Nothing already stored is lost and devices still get updates, but no new bytes are accepted. |
+| `This account has no active plan: publishing is read-only.` | The account has no active plan (or it lapsed). Publishing and uploads are closed until a plan is active; devices keep getting what is already published. Ask the account owner or Otaflow. |
+| `Platform storage is full (... bytes used; this needs ... more). Free space, add a storage pack, or connect your own bucket.` | The account's storage is full. Nothing stored is lost and devices still get updates, but no new bytes are accepted. |
+| `Only ios is published for now.` | `--platform android` is not available yet. |
+| `That key id is already used on this app (revoked ids stay taken): choose another.` | A key id is used once. Pick a new `--key-id` for the new key. |
 | `The signature does not verify under key ...` | The manifest was signed with a different key than the one named. Use the matching `--key-id` and key. |
 
 ## Promotion and rollback
@@ -40,5 +42,15 @@ Messages are shown as the CLI prints them. Fix the cause; do not work around a r
 | `Could not read the OS keychain.` | Use `OTAFLOW_CREDENTIALS=file` to keep the login in a file. |
 
 ## On the device
+
+Work down this list when a build does not pick up an update (`references/setup.md` has the details):
+
+1. **Is it a release build** (not Expo Go, not a debug or development-client build)?
+2. **Does the binary ask for the channel you published to?** `expo-channel-name` in `updates.requestHeaders`; with none, the server answers "no update".
+3. **Is the runtime version the same?** Compare `npx expo-updates runtimeversion:resolve --platform ios` for the build's configuration with the runtime in `otaflow list`. A different one (a native change, or a fingerprint split between profiles) means the update is for another binary.
+4. **Does the binary hold the certificate for the key that signed?** `codeSigningCertificate` and `codeSigningMetadata.keyid` at build time must match the key used to publish; otherwise the device refuses every update.
+5. **Is the channel paused?** `otaflow list` shows PAUSED; `otaflow resume`.
+6. **Did you open the app twice?** The first launch downloads, the second runs it.
+7. **Is the head what you expect?** `otaflow list`; a rollback or a newer promotion may have replaced it.
 
 Devices download at launch and run an update at the **next** launch: close the app fully and open it twice. A device that refuses an update keeps what it runs: that happens for a manifest not signed by the key in its certificate, a manifest or file that was changed, or a different runtime version. A runtime version change (anything native) needs a new binary.

@@ -28,18 +28,22 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - run: npm ci
-      - run: npx otaflow publish -m "${{ github.event.head_commit.message }}"
+      - run: npx otaflow publish -m "$COMMIT_MESSAGE"
         env:
           OTAFLOW_API_KEY: ${{ secrets.OTAFLOW_API_KEY }}
           OTAFLOW_SIGNING_KEY: ${{ secrets.OTAFLOW_SIGNING_KEY }}
+          # Public values the app reads at build time: publish reads no .env file.
+          EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+          # Passed through the environment, never interpolated into the script (a commit message can contain anything).
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
       - run: npx otaflow promote --wait
         env:
           OTAFLOW_API_KEY: ${{ secrets.OTAFLOW_API_KEY }}
 ```
 
-`.otaflow/project.json` and `certs/certificate.pem` are committed; the key and the API key are not. `promote --wait` creates a request and waits for the owner or the manager to approve it in the dashboard or the CLI; drop it if the pipeline should not block.
+`.otaflow/project.json` and `certs/certificate.pem` are committed; the key and the API key are not. The publish step must run in the project folder (set `working-directory` in a monorepo), and its git tree must be clean: install dependencies with `npm ci`, which does not modify tracked files. `promote --wait` creates a request and waits for the owner or the manager to approve it in the dashboard or the CLI; drop it if the pipeline should not block.
 
 ## 3. Rotating or removing
 
 - Delete a key: `otaflow apikey delete --app my-app --id <keyId>` (find the id with `otaflow apikey list --app my-app`). Whatever uses it stops working at once.
-- Replace a signing key: `otaflow keys init --key-id v2 --force` registers a new key; binaries already shipped keep trusting the old certificate, so keep the old key active until they are gone.
+- Replace a signing key: `otaflow keys init --key-id v2` makes and registers a new key under a **new** id (an id is never reused). Binaries already shipped keep trusting the old certificate, so keep the old key active until they are gone, and name `v2` in `codeSigningMetadata.keyid` (and the certificate path) of new builds. Revoking the old key (`keys revoke`) stops publishes signed with it.

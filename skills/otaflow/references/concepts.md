@@ -25,7 +25,7 @@
 | Approve a promotion | yes | yes | no | never |
 | Roll back | any earlier update, or embedded | the latest update only | no | with `rollback` |
 | Pause / resume | yes | yes | no | with `pause` |
-| Members, keys, plan | yes | read the activity log | no | no |
+| Members list, API keys, plan | yes | read the members list and the activity log | no | no |
 
 An account has one owner, at most one manager, and members. A member sees only the apps they were added to.
 

@@ -1,6 +1,6 @@
 # otaflow commands
 
-Every command takes `--json` (machine-readable output) and `--api-url <url>` (or `OTAFLOW_API_URL`; default `https://api.otaflow.com`). Run `otaflow <command> --help` for the flags of your installed version.
+Every command takes `--json` (machine-readable output) and `--api-url <url>` (or `OTAFLOW_API_URL`; default `https://api.otaflow.com`). Flags are listed below because `otaflow <group> <command> --help` (for example `keys init`, `apps create`, `apikey create`, `promotions approve`) does not print the command's own flags in this version; `otaflow rollback --help`, `publish --help`, `promote --help`, `list --help` and `pause --help` do.
 
 ## Account and apps
 
@@ -19,23 +19,23 @@ The private key never leaves the user's machine.
 
 | Command | What it does |
 |---|---|
-| `otaflow keys init [--key-id main] [--cert-dir ./certs] [--force]` | Generate a 2048-bit RSA key and certificate, register the public half, write the certificate to the project. |
-| `otaflow keys register --cert <pem> [--key <pem>]` | Register an existing key (for example one that already shipped in binaries). |
+| `otaflow keys init [--key-id main] [--key-dir <dir>] [--cert-dir <dir>] [--years <1-30>] [--force]` | Generate a 2048-bit RSA key and certificate, register the public half, write the certificate to `./certs` (`certificate.pem` for `main`, `<id>.certificate.pem` otherwise) and the private key to the user's key folder (`~/.config/otaflow/keys/<appId>/<id>.key.pem`). The key is written to disk **before** registering, so a network failure never loses it. It refuses if that private key file already exists. `--force` overwrites the local file with a new key, which is only useful when that id was never registered (a failed first run): the API refuses to register an id twice, so a rotation always uses a new `--key-id`. |
+| `otaflow keys register --key <private.pem> --cert <certificate.pem> [--key-id <id>]` | Register an existing key and certificate (for example one that already shipped in binaries). Both files are required: the key signs a proof of possession; the private key is not uploaded. |
 | `otaflow keys list` | Keys registered for the app and whether each is active or revoked. |
-| `otaflow keys public` | Print the fingerprint of a local private key. |
+| `otaflow keys public [--key <private.pem>]` | Print the fingerprint of a local private key. |
 | `otaflow keys revoke --key-id <id>` | Stop accepting publishes signed with the key (owner). Installed apps that trust its certificate keep running what they run. |
 
-The key is found in this order: `--key <path>`, `OTAFLOW_SIGNING_KEY` (the PEM text), `OTAFLOW_SIGNING_KEY_PATH`, then the app's key folder in the user's config directory.
+A key id is used once per app: a revoked id stays taken, so a new key always gets a new `--key-id` (and new builds name it in `codeSigningMetadata.keyid`). The key is found in this order: `--key <path>`, `OTAFLOW_SIGNING_KEY` (the PEM text), `OTAFLOW_SIGNING_KEY_PATH`, then the app's key folder in the user's config directory.
 
 ## Publishing
 
 | Command | What it does |
 |---|---|
 | `otaflow publish [-m <message>] [--channel preview\|production] [--platform ios] [--key-id main] [--key <path>] [--new-runtime]` | Export with `expo export`, hash and upload only the files the platform lacks, sign the manifest locally, publish. Default channel: `preview`. Straight to `production` is for the account owner only. |
-| `otaflow list` | Each channel's head, paused state, runtimes seen and recent updates. |
+| `otaflow list [--channel <c>] [--limit <n>]` | Each channel's head, paused state, runtimes seen and recent updates. |
 | `otaflow pause --channel <c>` / `otaflow resume --channel <c>` | The brake: devices get no update while paused. Needs no key. |
 
-`publish` checks, in this order: a clean git tree; the runtime version (`expo-updates` must be installed); a bundle free of `.env` values; the account's plan; the commit is not already the head. `--new-runtime` skips only the "no device has asked for this runtime" check.
+What `publish` does, in order: refuses any platform but `ios`; needs a login or `OTAFLOW_API_KEY`; checks the git tree is clean **for the project folder** (`git status` limited to it); loads the signing key; resolves the runtime version with `npx expo-updates runtimeversion:resolve` (`expo-updates` must be installed); exports the bundle with `expo export` and **no `.env` files read**; scans the bundle for values from `.env*` files; asks the API which files it lacks and whether they fit the account's storage; uploads them (four at a time); signs the manifest locally; publishes. The API can still refuse: no active plan, the key unknown or revoked, a signature that does not verify, a stale manifest, the same commit as the head, or an unseen runtime. `--new-runtime` skips only the "no device has asked for this runtime" check.
 
 ## Promotion
 
