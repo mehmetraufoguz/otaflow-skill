@@ -15,6 +15,7 @@ Messages are shown as the CLI prints them. Fix the cause; do not work around a r
 | `expo-updates` errors from `runtimeversion:resolve` | `expo-updates` is not installed in the project, or the project is not an Expo app. `npx expo install expo-updates`. |
 | `Only the account owner publishes straight to production; promote from preview.` | Publish to preview, then `otaflow promote`. |
 | `This account has no active plan: publishing is read-only.` | The account has no active plan (or it lapsed). Publishing and uploads are closed until a plan is active; devices keep getting what is already published. Ask the account owner or Otaflow. |
+| `That update's files were cleaned up to free space...` | A rollback or promotion of an update whose files were deleted by `otaflow storage gc`. Publish it again from its commit. |
 | `Platform storage is full (... bytes used; this needs ... more). Free space, add a storage pack, or connect your own bucket.` | The account's storage is full. Nothing stored is lost and devices still get updates, but no new bytes are accepted. |
 | `The platform must be ios or android.` | Another value was passed to `--platform`. |
 | `This commit is already the head of <channel>: commit the change you meant to ship.` | Nothing new since the last publish of this runtime; the CLI says so before exporting. |

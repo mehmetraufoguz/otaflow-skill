@@ -3,6 +3,7 @@
 ## The pieces
 
 - **App**: one Expo app. Its update URL is `https://ota.otaflow.com/u/<slug>/manifest`. The slug is permanent.
+- **Cleanup**: platform storage is freed by deleting files no kept update uses (`otaflow storage gc`, or the dashboard's Free up space). The owner can do it by hand when out of room; a weekly job does it slowly on its own. Update history stays, but an update whose files were deleted cannot be rolled back to or promoted again.
 - **Account**: owns apps and has a plan that sets seats and storage. An app can keep its updates in the customer's own bucket instead (`otaflow storage connect`, chosen before the first publish); those bytes do not count against the plan.
 - **Channels**: `preview` and `production`. A binary asks for one channel (the `expo-channel-name` request header).
 - **Runtime version**: a hash of the native layer (`runtimeVersion: { policy: "fingerprint" }`). An update only reaches binaries with the same runtime, so a JavaScript-only change reaches installed apps and a native change needs a new binary.
