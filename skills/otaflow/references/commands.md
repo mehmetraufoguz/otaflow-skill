@@ -10,7 +10,7 @@ Every command takes `--json` (machine-readable output) and `--api-url <url>` (or
 | `otaflow whoami` | The signed-in user. |
 | `otaflow logout` | Forget this machine's login and end the session. |
 | `otaflow apps list` | The apps the user can see, with ids and the user's role. |
-| `otaflow apps create --name <n> --slug <s> [--bundle-id <id>]` | Create an app in the user's own account (owner only). The slug is part of the update URL and is never reused. |
+| `otaflow apps create --name <n> --slug <s> [--bundle-id <ios id>] [--package-android <package>]` | Create an app in the user's own account (owner only). The slug is part of the update URL and is never reused. |
 | `otaflow init --app <slug-or-id>` | Link the current folder to an app (writes `.otaflow/project.json`). |
 
 ## Signing keys
@@ -75,17 +75,17 @@ Rules for the agent: never put the secret key in a file, a flag or the conversat
 | Command | What it does |
 |---|---|
 | `otaflow members list [--app <slug>]` | The account's members, roles and the apps each can reach. |
-| `otaflow members invite` | A one-time invite link (valid a week). The person joins with it, then needs app access. |
-| `otaflow members role --member <email\|id> --role <manager\|member>` | Owner only; one manager at a time. |
-| `otaflow members access --member <email\|id> --to <app slug> [--revoke]` | Give a member an app, or take it away. |
-| `otaflow members remove --member <email\|id>` | Remove them; the CI keys they made stop working. |
+| `otaflow members invite [--app <slug>]` | A one-time invite link (valid a week). The person joins with it, then needs app access. |
+| `otaflow members role [--app <slug>] --member <email\|id> --role <manager\|member>` | Owner only; one manager at a time. |
+| `otaflow members access [--app <slug>] --member <email\|id> --to <app slug> [--revoke]` | Give a member an app, or take it away. |
+| `otaflow members remove [--app <slug>] --member <email\|id>` | Remove them; the CI keys they made stop working. |
 | `otaflow log [--limit n] [--action <prefix>] [--actor <text>] [--only-app <name>]` | The account's activity log, newest first (owner and manager). |
 
 These act on the account that owns the linked project (or `--app`). They need a person's login, not a CI key.
 
 ## Checking a project
 
-`otaflow doctor [--key-id main]` checks, in order: Node.js 22+, the project link, the login and app access, `app.json` (update URL for this app, certificate and key id, channel header, runtime policy), the private key on this machine, the certificate (valid, and the registered key's), `expo-updates`, the git tree and the runtime version (and whether any device has asked for it). It prints `ok` / `warn` / `FAIL` per line and exits 1 if anything failed. Run it first when something does not work.
+`otaflow doctor [--key-id main] [--platform ios|android]` checks, in order: Node.js 22+, the project link, the login and app access, `app.json` (update URL for this app, certificate and key id, channel header, runtime policy), the private key on this machine, the certificate (valid, and the registered key's), `expo-updates`, the git tree and the runtime version (and whether any device has asked for it). It prints `ok` / `warn` / `FAIL` per line and exits 1 if anything failed. Run it first when something does not work.
 
 ## CI keys
 

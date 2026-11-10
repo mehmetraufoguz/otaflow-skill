@@ -41,7 +41,7 @@ Messages are shown as the CLI prints them. Fix the cause; do not work around a r
 |---|---|
 | `Not signed in. Run otaflow login.` | Run `otaflow login`, or set `OTAFLOW_API_KEY` in CI. |
 | `This API key is not valid.` | The key was deleted or expired. Create another. |
-| The login code page says the code is not valid | Codes expire after a few minutes. Run `otaflow login` again. |
+| The login code page says the code is not valid | The code expires (about 30 minutes) and works once. Run `otaflow login` again. |
 | `Could not read the OS keychain.` | Use `OTAFLOW_CREDENTIALS=file` to keep the login in a file. |
 
 ## On the device

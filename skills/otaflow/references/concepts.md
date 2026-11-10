@@ -27,6 +27,8 @@
 | Roll back | any earlier update, or embedded | the latest update only | no | with `rollback` |
 | Pause / resume | yes | yes | no | with `pause` |
 | Members list, API keys, plan | yes | read the members list and the activity log | no | no |
+| Invite, roles, remove members; create and delete API keys | yes | no | no | no |
+| Signing keys (register, revoke), own bucket (connect, disconnect), storage cleanup | yes | no | no | no |
 
 An account has one owner, at most one manager, and members. A member sees only the apps they were added to.
 
